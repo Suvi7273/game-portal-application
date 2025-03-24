@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - {{ username }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .game-history {
+            width: 80%;
+            max-width: 600px;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .game-history th, .game-history td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .average-score {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #0055ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, {{ username }}</h1>
+    
+    <h2>Game History</h2>
+    <table class="game-history">
+        <tr>
+            <th>Game</th>
+            <th>Score</th>
+            <th>Date</th>
+        </tr>
+        {% for game in games %}
+        <tr>
+            <td>{{ game.game }}</td>
+            <td>{{ game.score }}</td>
+            <td>{{ game.submitted_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <div class="average-score">
+        Average Score: {{ average_score }}%
+    </div>
+</body>
+</html>
