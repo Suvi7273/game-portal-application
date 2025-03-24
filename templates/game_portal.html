@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Game Portal</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            background-image: url(/static/welcome.jpg);
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+        }
+        h1 {
+            font-size: 3em;
+            color: #333;
+        }
+        label {
+            font-size: 1.5em;
+        }
+        input[type="text"] {
+            font-size: 1.2em;
+            padding: 10px;
+            width: 300px;
+            margin: 10px 0;
+        }
+        .button {
+            font-size: 2em;
+            padding: 20px 40px;
+            margin: 15px;
+            width: 220px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .button.easy {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+        .button.moderate {
+            background-color: #FFA500; /* Orange */
+            color: white;
+        }
+        .button.hard {
+            background-color: #FF4500; /* Red */
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Game Portal</h1>
+        <form action="/select_difficulty" method="post">
+            <label for="name">Name</label>
+            <br>
+            <input type="text" id="name" name="name" required>
+            <br><br>
+            <label for="age">Age</label>
+            <br>
+            <input type="text" id="age" name="age" required>
+            <br><br>
+            <button type="submit" name="difficulty" value="easy" class="button easy">Easy</button>
+            <button type="submit" name="difficulty" value="moderate" class="button moderate">Moderate</button>
+            <button type="submit" name="difficulty" value="hard" class="button hard">Hard</button>
+        </form>
+    </div>
+</body>
+</html>

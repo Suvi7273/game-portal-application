@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Matching Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            background-image:url("/static/memory.jpg");
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 10px;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .card.flipped {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Memory Matching Game</h1>
+    <p>Player: {{ name }}</p>
+    <div class="game-board"></div>
+
+    <script>
+        const cardValues = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        let gameBoard = document.querySelector('.game-board');
+        let firstCard = null;
+        let secondCard = null;
+        let matchedPairs = 0;
+        let totalPairs = cardValues.length / 2;
+        let score = 100;  // Initial score
+
+        cardValues.sort(() => 0.5 - Math.random());
+
+        cardValues.forEach((value) => {
+            let card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.value = value;
+            card.addEventListener('click', flipCard);
+            gameBoard.appendChild(card);
+        });
+
+        function flipCard() {
+            if (this.classList.contains('flipped')) return;
+            this.classList.add('flipped');
+            this.textContent = this.dataset.value;
+
+            if (!firstCard) {
+                firstCard = this;
+            } else {
+                secondCard = this;
+                if (firstCard.dataset.value === secondCard.dataset.value) {
+                    firstCard = null;
+                    secondCard = null;
+                    matchedPairs++;
+                    if (matchedPairs === totalPairs) {
+                        gameEnd();
+                    }
+                } else {
+                    setTimeout(() => {
+                        firstCard.classList.remove('flipped');
+                        secondCard.classList.remove('flipped');
+                        firstCard.textContent = '';
+                        secondCard.textContent = '';
+                        firstCard = null;
+                        secondCard = null;
+                        score -= 10;  // Reduce score for incorrect match
+                    }, 1000);
+                }
+            }
+        }
+
+        function gameEnd() {
+            alert("You've matched all pairs! Your score: " + score);
+            updateScore(score);
+        }
+
+        function updateScore(score) {
+            fetch('/update_score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: "{{ name }}",
+                    age: "{{ age }}",
+                    score: score,
+                    game: 'memory_game',
+                    difficulty: "{{ difficulty }}"
+                }),
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/dashboard/{{ difficulty }}/memory_game/scores/{{ name }}`;
+                }
+            });
+        }
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleClick);
+        });
+    </script>
+</body>
+</html>

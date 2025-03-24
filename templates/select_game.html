@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Select Game</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f8ff;
+            background-image: url(/static/aft_wel.jpg);
+        }
+        .container {
+            text-align: center;
+        }
+        h2 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            margin: 10px 0;
+        }
+        .button {
+            font-size: 1.8em;
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Select a Game for {{ difficulty.capitalize() }} Difficulty</h2>
+        {% for game in games %}
+            <form action="{{ url_for('game', difficulty=difficulty, game=game, name=name, age=age) }}" method="get">
+                <button type="submit" class="button">{{ game.replace('_', ' ').capitalize() }}</button>
+            </form>
+        {% endfor %}
+    </div>
+</body>
+</html>

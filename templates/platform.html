@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Runner Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #87CEFA; /* Sky blue background */
+        }
+        canvas {
+            border: 2px solid #000;
+            background-color: #FFF;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas" width="600" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Game variables
+        let score = 0;
+        let isJumping = false;
+        let jumpHeight = 0;
+        let gameOver = false;
+        const jumpLimit = 50; // Max jump height
+        const gravity = 2;
+        const groundHeight = 150;
+
+        // Player properties
+        const player = {
+            x: 50,
+            y: groundHeight,
+            width: 30,
+            height: 30,
+            color: "#000",
+        };
+
+        // Obstacle properties
+        const obstacles = [];
+        let obstacleFrequency = 150; // Frequency of obstacle creation
+        let obstacleSpeed = 3; // Speed of obstacles
+
+        // Game loop
+        function gameLoop() {
+            if (gameOver) return; // Stop the loop when game is over
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            drawObstacles();
+            updateObstacles();
+            collisionDetection();
+            updateScore();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Draw the player
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y - jumpHeight, player.width, player.height);
+            if (isJumping) {
+                jumpHeight += gravity;
+                if (jumpHeight >= jumpLimit) {
+                    isJumping = false;
+                }
+            } else if (jumpHeight > 0) {
+                jumpHeight -= gravity;
+            }
+
+            if (player.y - jumpHeight < groundHeight) {
+                player.y = groundHeight + jumpHeight;
+            }
+        }
+
+        // Draw obstacles
+        function drawObstacles() {
+            obstacles.forEach(obstacle => {
+                ctx.fillStyle = "#FF0000"; // Red color for obstacles
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+        }
+
+        // Update obstacles
+        function updateObstacles() {
+            if (Math.random() < 0.02) { // Adjust probability for obstacle creation
+                const obstacleWidth = 20 + Math.random() * 30;
+                obstacles.push({
+                    x: canvas.width,
+                    y: groundHeight,
+                    width: obstacleWidth,
+                    height: 30,
+                });
+            }
+
+            for (let i = 0; i < obstacles.length; i++) {
+                obstacles[i].x -= obstacleSpeed; // Move obstacle to the left
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1); // Remove off-screen obstacles
+                    score++;
+                    i--;
+                }
+            }
+        }
+
+        // Collision detection
+        function collisionDetection() {
+            for (const obstacle of obstacles) {
+                if (
+                    player.x < obstacle.x + obstacle.width &&
+                    player.x + player.width > obstacle.x &&
+                    player.y - jumpHeight < obstacle.y + obstacle.height &&
+                    player.y > obstacle.y
+                ) {
+                    gameOver = true; // Set game over state
+                    submitScore(score); // Submit the score on game over
+                    return;
+                }
+            }
+        }
+
+        // Update score display
+        function updateScore() {
+            document.getElementById("score").innerText = "Score: " + score;
+        }
+
+        // Key event listener
+        document.addEventListener("keydown", function (e) {
+            if (e.code === "Space" || e.code === "ArrowUp") {
+                if (!isJumping) {
+                    isJumping = true; // Start jumping
+                }
+            }
+        });
+
+        // Function to submit score
+        function submitScore(score) {
+            const name = "{{ name }}";
+            const age = "{{ age }}";
+            const difficulty = "{{ difficulty }}";
+            const game = "platform"; // Set game name to "platform"
+
+            fetch("/update_score", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    age: age,
+                    score: score,
+                    game: game
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Score updated:', data);
+                window.location.href = '/dashboard/hard_scores';  // Redirect to scoreboard
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html>

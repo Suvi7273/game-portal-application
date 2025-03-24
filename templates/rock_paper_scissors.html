@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock, Paper, Scissors</title>
+    <style>
+        body {
+            background-image: url('/static/rock.jpg'); /* Path to your background image */
+            background-size: cover;
+            background-position: center;
+        }
+    
+        h2 {
+            text-align: center;
+            color: white; /* Adjust color to ensure readability on the background */
+        }
+        h1 {
+            text-align: center;
+            animation: blink 2s infinite; /* Animation for blinking effect */
+        }
+
+        /* Define keyframes for the blinking effect with color transitions */
+        @keyframes blink {
+            0% { color: red; }
+            25% { color: blue; }
+            50% { color: green; }
+            75% { color: orange; }
+            100% { color: purple; }
+        }
+
+        button {
+            font-size: 20px;
+            margin: 10px;
+            padding: 10px 20px;
+        }
+
+        /* Styling for displaying results */
+        #result, #scoreDisplay {
+            font-size: 18px;
+            text-align: center;
+            margin-top: 20px;
+            color: black; /* Adjust this for readability */
+        }
+    </style>
+</head>
+<body>
+    <h1>Rock, Paper, Scissors</h1>
+    <h2>Player: {{ name }}</h2>
+    <center>
+    <div>
+        <button onclick="playGame('rock')">Rock</button>
+        <button onclick="playGame('paper')">Paper</button>
+        <button onclick="playGame('scissors')">Scissors</button>
+        <button onclick="finishGame()">Finish</button> <!-- Finish button -->
+    </div>
+    </center>
+    <p id="result"></p>
+    <p id="scoreDisplay"></p> <!-- Display score here -->
+
+    <script>
+        let score = 0;  // Initialize score
+        let rounds = 0;  // Initialize rounds
+
+        function playGame(playerChoice) {
+            const choices = ['rock', 'paper', 'scissors'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+            let result = '';
+
+            rounds++; // Increment rounds count
+
+            if (playerChoice === computerChoice) {
+                result = 'It\'s a tie!';
+            } else if (
+                (playerChoice === 'rock' && computerChoice === 'scissors') ||
+                (playerChoice === 'paper' && computerChoice === 'rock') ||
+                (playerChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                result = 'You win!';
+                score += 100;  // Increment score for winning
+            } else {
+                result = 'You lose!';
+            }
+
+            // Display computer's choice and result in the 'result' paragraph
+            document.getElementById('result').textContent = `Computer chose ${computerChoice}. ${result}`;
+            // Update score and rounds count
+            document.getElementById('scoreDisplay').textContent = `Score: ${score} | Rounds: ${rounds}`;
+        }
+
+        function finishGame() {
+            // Update the score and redirect to the scoreboard
+            updateScore(score);
+        }
+
+        function updateScore(score) {
+       fetch('/update_score', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: "{{ name }}",
+            age: "{{ age }}",
+            score: score,
+            game: 'rock_paper_scissors',
+            difficulty: "{{ difficulty }}"
+        }),
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = `/dashboard/{{ difficulty }}/rock_paper_scissors/scores/{{ name }}`;
+        }
+    });
+}
+
+    </script>
+</body>
+</html>

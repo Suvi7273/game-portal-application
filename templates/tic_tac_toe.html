@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            background-image: url("/static/tic.jpg");
+            background-size: cover;
+            background-position: center;
+        }
+        h1, h2 {
+            color: #000;
+            text-align: center;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+        }
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            font-size: 2rem;
+            background-color: #fff;
+            border: 2px solid #000;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic-Tac-Toe</h1>
+    <h2>Player: {{ name }}</h2>
+    <div class="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <script>
+        let currentPlayer = 'X';
+        const cells = document.querySelectorAll('.cell');
+        const board = ['', '', '', '', '', '', '', '', ''];
+        let score = 0;
+
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        function checkWinner(player) {
+            return winningCombinations.some(combo =>
+                combo.every(i => board[i] === player)
+            );
+        }
+
+        function computerMove() {
+            const availableCells = board.map((cell, index) => cell === '' ? index : null).filter(index => index !== null);
+            if (availableCells.length === 0) return;
+
+            const randomIndex = availableCells[Math.floor(Math.random() * availableCells.length)];
+            board[randomIndex] = 'O';
+            cells[randomIndex].textContent = 'O';
+
+            if (checkWinner('O')) {
+                setTimeout(() => {
+                    alert('Computer wins!');
+                    updateScore(score);
+                }, 10);
+            } else if (board.every(cell => cell)) {
+                setTimeout(() => {
+                    alert('It\'s a tie!');
+                    updateScore(score);
+                }, 10);
+            }
+        }
+
+        function handleClick(e) {
+            const index = e.target.getAttribute('data-index');
+            if (!board[index] && !checkWinner('X') && !checkWinner('O')) {
+                board[index] = currentPlayer;
+                e.target.textContent = currentPlayer;
+
+                if (checkWinner(currentPlayer)) {
+                    setTimeout(() => {
+                        alert(`${currentPlayer} wins!`);
+                        score += 100;
+                        updateScore(score);
+                    }, 10);
+                    return;
+                } else if (board.every(cell => cell)) {
+                    setTimeout(() => {
+                        alert('It\'s a tie!');
+                        updateScore(score);
+                    }, 10);
+                    return;
+                }
+
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+
+                if (currentPlayer === 'O') {
+                    setTimeout(computerMove, 500);
+                    currentPlayer = 'X';
+                }
+            }
+        }
+
+        function updateScore(score) {
+            fetch('/update_score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: "{{ name }}",
+                    age: "{{ age }}",
+                    score: score,
+                    game: 'tic_tac_toe',
+                    difficulty: "{{ difficulty }}"
+                }),
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/dashboard/{{ difficulty }}/tic_tac_toe/scores/{{ name }}`;
+                }
+            });
+        }
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleClick);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Game</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: blue;
+        }
+        .game-container {
+            width: 300px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .game-box {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select Your Game</h1>
+    <div class="game-container" id="gameContainer"></div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const difficulty = urlParams.get('difficulty');
+
+        // Define games based on difficulty
+        const games = {
+            easy: [
+ { name: 'Tic-Tac-Toe', url: 'tic_tac_toe.html' },
+                { name: 'Memory Game', url: 'memory_game.html' },
+                { name: 'Rock-Paper-Scissors', url: 'rock_paper_scissors.html' }
+            ],
+            moderate: [
+                { name: 'Snake Game', url: 'snake_game.html' }
+            ],
+            hard: [
+                { name: 'Sudoku Game', url: 'sudoku_game.html' }
+            ]
+        };
+
+        // Create game boxes
+        const gameContainer = document.getElementById('gameContainer');
+        games[difficulty].forEach(game => {
+            const gameBox = document.createElement('div');
+            gameBox.className = 'game-box';
+            gameBox.innerHTML = `<h2>${game.name}</h2><a href="${game.url}">Play</a>`;
+            gameContainer.appendChild(gameBox);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ game | capitalize }} Scores - {{ difficulty | capitalize }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Top Scores for {{ game | capitalize }} ({{ difficulty | capitalize }})</h1>
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Score</th>
+            <th>Date</th>
+        </tr>
+        {% for score in scores %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ score.name }}</td>
+            <td>{{ score.score }}</td>
+            <td>{{ score.submitted_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

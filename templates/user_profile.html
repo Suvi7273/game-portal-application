@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - {{ username }}</title>
+    <style>
+        body {
+            background-image: url(/static/memory.jpg);
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .game-history {
+            width: 80%;
+            max-width: 600px;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .game-history th, .game-history td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .average-score {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #0055ff;
+        }
+        .redirect-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #0055ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+    <script>
+        function redirectToGame(game, difficulty, name, age) {
+            // Redirect to the game page
+            window.location.href = `/moderate_games/${name}/${age}`;
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome, {{ username }}</h1>
+    
+    <h2>Game History</h2>
+    <table class="game-history">
+        <tr>
+            <th>Game</th>
+            <th>Score</th>
+            <th>Date</th>
+        </tr>
+        {% for game in games %}
+        <tr>
+            <td>{{ game.game }}</td>
+            <td>{{ game.score }}</td>
+            <td>{{ game.submitted_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <div class="average-score">
+        Average Score: {{ average_score }}%
+    </div>
+
+    {% if games %}
+        <button class="redirect-button" onclick="redirectToGame('{{ games[-1].game }}', '{{ games[-1].difficulty }}', '{{ username }}', '{{ games[-1].age }}')">
+            Start Playing Current Game
+        </button>
+    {% else %}
+        <p>No games played yet. Please select a game to start.</p>
+    {% endif %}
+</body>
+</html>
